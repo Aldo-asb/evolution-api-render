@@ -5,5 +5,8 @@ WORKDIR /evolution
 # Remove o .env padrão da imagem oficial
 RUN rm -f /evolution/.env
 
-# Mapeia a variável do Render (DATABASE_CONNECTION_URI) para DATABASE_URL que o Prisma espera
-ENTRYPOINT ["/bin/bash", "-c", "export DATABASE_URL=\"$DATABASE_CONNECTION_URI\" && npm run db:deploy && npm run start:prod"]
+# Define explicitamente a DATABASE_URL usando a variável do Render
+ENV DATABASE_URL=$DATABASE_CONNECTION_URI
+
+# Executa as migrações e inicia a aplicação
+ENTRYPOINT ["/bin/bash", "-c", "npx prisma migrate deploy --schema ./prisma/postgresql-schema.prisma && npm run start:prod"]
